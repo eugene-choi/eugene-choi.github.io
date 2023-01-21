@@ -39,12 +39,15 @@ body {
   @include breakpoint($large) {
     float: right;
     width: calc(100% - #{$right-sidebar-width-narrow});
-    padding-right: $right-sidebar-width-narrow;
+    //padding-right: $right-sidebar-width-narrow;
+    padding-right: 200px;
   }
 
   @include breakpoint($x-large) {
     width: calc(100% - #{$right-sidebar-width});
-    padding-right: $right-sidebar-width;
+    // width: calc(100% - #{$right-sidebar-width-narrow});
+    // padding-right: $right-sidebar-width;
+    padding-right: 200px;
   }
 
   .page__inner-wrap {
@@ -558,11 +561,12 @@ body {
 .wide {
   .page {
     @include breakpoint($large) {
-      padding-right: 0;
+      // padding-right: 0;
+      padding-right: 200px;
     }
 
     @include breakpoint($x-large) {
-      padding-right: 0;
+      padding-right: 200px;
     }
   }
 
