@@ -107,8 +107,8 @@ analytics:
 author:
   name             : "Eugene Choi"
   avatar           : "/assets/images/barcelona.jpeg"
-    # bio              : "NLP Research Engineer @ [RD](https://realitydefender.com/)"
-  bio              : "Machine Learning @ [Cohere](https://cohere.com)"
+    # bio              : "NLP Research Engineer @ [RD](https://realitydefender.com/) • [ML²](https://wp.nyu.edu/ml2/)"
+  bio              : "NLP Research Engineer @ [RD](https://realitydefender.com/)"
   location         : "New York, NY"
   email            : "eugene.choi@nyu.edu"
   links:
