@@ -20,10 +20,13 @@ minimal_mistakes_skin   : "dark"
 
 # Site Settings
 locale                   : "en-US"
-title                    : "Eugene Choi"
+# title                    : "Eugene Choi"
+# title                    : "Eugene Choi || 최유진 || 崔洧賑"
+title                    : "Home"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
-name                     : "Eugene Choi"
+# name                     : "Eugene Choi"
+name                    : "Eugene Choi"
 description              : "Hey there! My name is Eugene, and I work on LLMs @ Cohere."
 url                      : # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
@@ -108,7 +111,10 @@ analytics:
 
 # Site Author
 author:
-  name             : "Eugene Choi"
+  # name             : "Eugene Choi"
+  # name             : "Eugene Choi (최유진)"
+  name             : "Eugene Choi (최유진, 崔洧賑)"
+  # name             : "Eugene Choi | 최유진 | 崔洧賑"
   avatar           : "/assets/images/barcelona.jpeg"
     # bio              : "NLP Research Engineer @ [RD](https://realitydefender.com/)"
   bio              : "Machine Learning @ [Cohere](https://cohere.com)"
