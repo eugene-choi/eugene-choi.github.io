@@ -12,16 +12,20 @@
   {% endif %}
 
   <div class="author__content">
+    <!-- 
     <h3 class="author__name p-name" itemprop="name">
+    <h3 class="author__name p-name" itemprop="name", style="padding-bottom:0px">
+    -->
+    <h3 class="author__name p-name" itemprop="name", style="line-height:0%;padding-top:4%">
       <a class="u-url" rel="me" href="{{ author.home | default: '/' | absolute_url }}" itemprop="url">{{ author.name }}</a>
       <!-- <p style="line-height:0%">崔洧賑</p> -->
       <!-- <p style="line-height:0%">최유진 崔洧賑</p> -->
     </h3>
     {% if author.bio %}
-      <div class="author__bio p-note" itemprop="description">
       <!-- 
-      <div class="author__bio p-note" itemprop="description", style="line-height:0%">
+      <div class="author__bio p-note" itemprop="description">
       -->
+      <div class="author__bio p-note" itemprop="description", style="line-height:0%;padding:0px">
         {{ author.bio | markdownify }}
       </div>
     {% endif %}
