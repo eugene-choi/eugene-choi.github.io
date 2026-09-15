@@ -1,256 +1,579 @@
----
-layout: single 
-author_profile: true
-classes: wide
----
-
-{{ content }}
-
-<!-- <h3 class="archive__subtitle">{{ site.data.ui-text[site.locale].recent_posts | default: "Recent Posts" }}</h3> -->
-
-<html>
+<!doctype html>
+<html lang="en">
 <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eugene Choi | Code Agents and LLM Post-training</title>
+
+<meta name="author" content="Eugene Choi (최유진)">
+<meta name="description" content="Eugene Choi is a Senior Member of Technical Staff at Cohere, working on reinforcement learning and synthetic data for post-training code agents.">
+<meta name="theme-color" content="#fbfbf8">
+<link rel="canonical" href="https://eugene-choi.github.io/">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Eugene Choi | Code Agents and LLM Post-training">
+<meta property="og:description" content="Reinforcement learning and synthetic data for post-training code agents.">
+<meta property="og:url" content="https://eugene-choi.github.io/">
+<meta property="og:image" content="https://eugene-choi.github.io/assets/images/eugene.png">
+<meta name="twitter:card" content="summary">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+
 <style>
-p.xsmall {
-    line-height: 1.55;
-    font-size: 9.5pt;
-    margin-left: 40px; 
+/* ============================================================
+   Tokens
+   ============================================================ */
+:root{
+  --paper:      #fbfbf8;
+  --ink:        #1b1b19;
+  --ink-soft:   #55554d;
+  --ink-mute:   #8b8b80;
+  --rule:       #e4e3db;
+  --rule-soft:  #efeee8;
+  --accent:     #2c5f5a;
+  --accent-lift:#3f827a;
+
+  --serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --sans:  "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --shell: 54rem;
+  --rail:  11rem;
+  --gap:   2.5rem;
 }
 
-p.small {
-    line-height: 1.55;
-    font-size: 11pt;
+/* ============================================================
+   Base
+   ============================================================ */
+*,*::before,*::after{ box-sizing:border-box; }
+
+html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; scroll-padding-top:5rem; }
+
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--serif);
+  font-size:1.0625rem;
+  line-height:1.65;
+  font-optical-sizing:auto;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
 }
 
-p.small_2 {
-    line-height: 1.55;
-    font-size: 12pt;
+img{ max-width:100%; display:block; }
+
+a{ color:inherit; }
+
+:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:3px;
+  border-radius:1px;
 }
 
-p.small_noindent {
-    line-height: 1.55;
-    font-size: 13pt;
+.skip{
+  position:absolute; left:-9999px;
+  background:var(--ink); color:var(--paper);
+  padding:.6rem 1rem; font-family:var(--sans); font-size:.875rem; z-index:100;
+}
+.skip:focus{ left:1rem; top:1rem; }
+
+.shell{
+  max-width:var(--shell);
+  margin-inline:auto;
+  padding-inline:1.75rem;
 }
 
-ul.small {
-    line-height: 1.55;
-    font-size: 11pt;
+/* ============================================================
+   Top bar
+   ============================================================ */
+.topbar{
+  position:sticky; top:0; z-index:50;
+  background:color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter:saturate(180%) blur(12px);
+  -webkit-backdrop-filter:saturate(180%) blur(12px);
+  border-bottom:1px solid transparent;
+  transition:border-color .25s ease;
+}
+.topbar.is-stuck{ border-bottom-color:var(--rule); }
+
+.topbar .shell{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:1.5rem; padding-block:1.15rem;
 }
 
-p.small2 {
-    line-height: 2.00;
-    font-size: 11.5pt;
-    margin-left: 40px; 
+.wordmark{
+  font-family:var(--serif);
+  font-size:1.0625rem; font-weight:500;
+  text-decoration:none; letter-spacing:-.005em;
+  white-space:nowrap;
+}
+.wordmark .han{
+  font-size:.8125rem; color:var(--ink-mute);
+  margin-left:.5rem; font-weight:400;
 }
 
-p.medium {
-    line-height: 1.55;
-    font-size: 12.5pt;
-    margin-left: 40px; 
+.navlinks{
+  display:flex; gap:1.5rem; margin:0; padding:0; list-style:none;
+  font-family:var(--sans); font-size:.8125rem; font-weight:500;
+  letter-spacing:.005em;
+}
+.navlinks a{
+  text-decoration:none; color:var(--ink-soft);
+  padding-bottom:.15rem;
+  border-bottom:1px solid transparent;
+  transition:color .18s ease, border-color .18s ease;
+}
+.navlinks a:hover{ color:var(--ink); border-bottom-color:var(--accent); }
+
+/* ============================================================
+   Hero
+   ============================================================ */
+.hero{ padding-block:5.5rem 4.5rem; }
+
+.hero-grid{
+  display:grid;
+  grid-template-columns:var(--rail) 1fr;
+  gap:var(--gap);
+  align-items:start;
 }
 
-p.big {
-    line-height: 1.55;
+.portrait{
+  width:100%; aspect-ratio:4/5; object-fit:cover;
+  object-position:center;          /* nudge to 'center 35%' if the crop clips your head */
+  border-radius:3px;
+  border:1px solid var(--rule);
+  filter:saturate(.94);
+  margin-top:.3rem;                /* optical: aligns top edge with the first line's cap-height */
 }
 
-p.noindent {
-    line-height: 1.55;
-    font-size: 12pt;
+.lede{ margin:0; }
+
+.lede p{
+  margin:0 0 1.15rem;
+  font-size:1.25rem; line-height:1.6;
+  letter-spacing:-.003em;
+  color:var(--ink);
+}
+.lede p:last-of-type{ margin-bottom:0; }
+.lede strong{ font-weight:600; }
+
+/* Inline prose links: ink text, hairline underline that warms on hover */
+.lede a,
+.entry-body p a,
+.foot a{
+  text-decoration:none;
+  border-bottom:1px solid var(--rule);
+  transition:border-color .18s ease, color .18s ease;
+}
+.lede a:hover,
+.entry-body p a:hover,
+.foot a:hover{ color:var(--accent); border-bottom-color:var(--accent-lift); }
+
+.social{
+  display:flex; flex-wrap:wrap; gap:1.25rem;
+  margin:2rem 0 0; padding:0; list-style:none;
+  font-family:var(--sans); font-size:.875rem; font-weight:500;
+}
+.social a{
+  text-decoration:none; color:var(--ink-soft);
+  border-bottom:1px solid var(--rule);
+  padding-bottom:.1rem;
+  transition:color .18s ease, border-color .18s ease;
+}
+.social a:hover{ color:var(--accent); border-bottom-color:var(--accent-lift); }
+
+.locale{
+  font-family:var(--sans); font-size:.875rem;
+  color:var(--ink-mute); margin:1.5rem 0 0;
 }
 
-h2.title {
-    font-weight: 500; 
-    margin-top: 0;
+/* ============================================================
+   Sections
+   ============================================================ */
+.section{ padding-block:2.75rem; }
+
+.section-head{
+  display:flex; align-items:baseline; gap:1rem;
+  margin:0 0 2.25rem;
+}
+.section-head h2{
+  margin:0;
+  font-family:var(--serif);
+  font-size:1.5rem; font-weight:500; letter-spacing:-.01em;
+  white-space:nowrap;
+}
+.section-head::after{
+  content:""; flex:1 1 auto; height:1px;
+  background:var(--rule); transform:translateY(-.3rem);
 }
 
+/* Entry: rail + body */
+.entry{
+  display:grid;
+  grid-template-columns:var(--rail) 1fr;
+  gap:var(--gap);
+  padding-block:1.6rem;
+  border-top:1px solid var(--rule-soft);
+}
+.entry:first-of-type{ border-top:none; padding-top:0; }
+
+.entry-rail{
+  font-family:var(--sans);
+  font-size:.75rem; font-weight:500;
+  line-height:1.5; letter-spacing:.02em;
+  color:var(--ink-mute);
+  padding-top:.35rem;
+}
+
+.entry-body{ min-width:0; }
+
+.entry-body h3{
+  margin:0 0 .35rem;
+  font-family:var(--serif);
+  font-size:1.1875rem; font-weight:500; line-height:1.4;
+  letter-spacing:-.005em;
+}
+.entry-body h3 a{
+  text-decoration:none;
+  border-bottom:1px solid var(--rule);
+  transition:border-color .18s ease, color .18s ease;
+}
+.entry-body h3 a:hover{ color:var(--accent); border-bottom-color:var(--accent-lift); }
+
+.byline{
+  margin:0 0 .2rem;
+  font-family:var(--sans); font-size:.8125rem; line-height:1.55;
+  color:var(--ink-soft);
+}
+.byline .me{ font-weight:600; color:var(--ink); }
+
+.venue{
+  margin:0;
+  font-family:var(--sans); font-size:.8125rem;
+  color:var(--ink-mute); font-style:italic;
+}
+
+.entry-body > p.note{
+  margin:.5rem 0 0;
+  font-size:1rem; line-height:1.6; color:var(--ink-soft);
+}
+
+/* Signature element: the mono tl;dr, ruled on the left */
+.tldr{
+  margin:.85rem 0 0;
+  padding-left:.9rem;
+  border-left:1px solid var(--accent-lift);
+  font-family:var(--mono);
+  font-size:.78125rem; line-height:1.7;
+  color:var(--ink-soft);
+  letter-spacing:-.01em;
+}
+.tldr .tag{ color:var(--accent); }
+
+.links{
+  display:flex; flex-wrap:wrap; gap:1rem;
+  margin:.75rem 0 0; padding:0; list-style:none;
+  font-family:var(--sans); font-size:.8125rem; font-weight:500;
+}
+.links a{
+  text-decoration:none; color:var(--accent);
+  border-bottom:1px solid var(--rule);
+  padding-bottom:.08rem;
+  transition:border-color .18s ease;
+}
+.links a:hover{ border-bottom-color:var(--accent-lift); }
+
+.credential{
+  margin:.4rem 0 0;
+  font-family:var(--mono); font-size:.75rem;
+  color:var(--ink-mute);
+}
+.credential a{ color:inherit; text-decoration:none; border-bottom:1px solid var(--rule); }
+.credential a:hover{ color:var(--accent); }
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.foot{
+  margin-top:3.5rem;
+  border-top:1px solid var(--rule);
+  padding-block:2rem 3.5rem;
+  font-family:var(--sans); font-size:.8125rem;
+  color:var(--ink-mute);
+  display:flex; flex-wrap:wrap; gap:.75rem 1.5rem; justify-content:space-between;
+}
+.foot a{ color:var(--ink-soft); border-bottom:1px solid var(--rule); text-decoration:none; }
+
+/* ============================================================
+   Reveal on scroll
+   ============================================================ */
+.reveal{ opacity:0; transform:translateY(8px); }
+.reveal.is-in{
+  opacity:1; transform:none;
+  transition:opacity .55s cubic-bezier(.22,.61,.36,1), transform .55s cubic-bezier(.22,.61,.36,1);
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width:46rem){
+  :root{ --gap:1.25rem; }
+  body{ font-size:1rem; }
+
+  .hero{ padding-block:3rem 3rem; }
+  .hero-grid{ grid-template-columns:1fr; gap:1.75rem; }
+  .portrait{ width:9rem; margin-top:0; }
+  .lede p{ font-size:1.125rem; }
+
+  .entry{ grid-template-columns:1fr; gap:.5rem; padding-block:1.5rem; }
+  .entry-rail{ padding-top:0; }
+
+  .navlinks{ gap:1.05rem; font-size:.78125rem; }
+  .wordmark .han{ display:none; }
+  .topbar .shell{ padding-block:.9rem; }
+  .shell{ padding-inline:1.25rem; }
+}
+
+@media (max-width:24rem){
+  .navlinks{ gap:.8rem; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+  .reveal{ opacity:1; transform:none; transition:none; }
+  *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+}
 </style>
 </head>
 
-<body>
-<p class="noindent">
-<h2 style="margin-top:0">Welcome!</h2>
-<p class="small_noindent">
+<body id="top">
+<a class="skip" href="#main">Skip to content</a>
 
-I am a Member of Technical Staff at <b><a href="https://cohere.com/" style="text-decoration: none" target="_blank">Cohere</a></b>, working on <b>RL post-training</b>.
+<header class="topbar">
+  <div class="shell">
+    <a class="wordmark" href="#top">Eugene Choi<span class="han">최유진</span></a>
+    <nav aria-label="Sections">
+      <ul class="navlinks">
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#research">Research</a></li>
+        <li><a href="#teaching">Teaching</a></li>
+        <li><a href="/resume/">Résumé</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
 
-<br><br>
+<main id="main">
 
-Previously, I was a research engineer at <a href="https://realitydefender.com/" style="text-decoration: none" target="_blank">Reality Defender</a>.
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="shell hero-grid">
+      <img class="portrait"
+           src="/assets/images/eugene.png"
+           alt="Eugene Choi">
+      <div>
+        <div class="lede">
+          <p>I am a Senior Member of Technical Staff at <a href="https://cohere.com/">Cohere</a>, where I work on <strong>reinforcement learning</strong> and <strong>synthetic data</strong> for post-training <strong>code agents</strong>.</p>
 
-Prior to that, I conducted machine learning research in the
-<a href="https://wp.nyu.edu/ml2/people/" style="text-decoration: none" target="_blank">Machine Learning for Language (ML²) group</a> at New York University.
-At ML², I had the privilege of being advised by 
-<a href="https://sites.google.com/view/cheolhyounglee" style="text-decoration: none" target="_blank">Dr. Cheolhyoung Lee</a> and 
-<a href="http://www.kyunghyuncho.me" style="text-decoration: none" target="_blank">Prof. Kyunghyun Cho</a>, and having closely worked with
-<a href="https://jasonphang.com" style="text-decoration: none" target="_blank">Dr. Jason Phang</a> and
-<a href="https://sleepinyourhat.github.io/" style="text-decoration: none" target="_blank">Prof. Sam Bowman</a>.
+          <p>Before Cohere I was a research engineer at <a href="https://realitydefender.com/">Reality Defender</a>. Prior to that I did machine learning research in the <a href="https://wp.nyu.edu/ml2/people/">Machine Learning for Language (ML²) group</a> at New York University, where I had the privilege of being advised by <a href="http://www.kyunghyuncho.me">Kyunghyun Cho</a> and <a href="https://sleepinyourhat.github.io/">Sam Bowman</a>, and working closely with <a href="https://sites.google.com/view/cheolhyounglee">Cheolhyoung Lee</a> and <a href="https://jasonphang.com">Jason Phang</a>.</p>
+        </div>
 
+        <ul class="social">
+          <li><a href="https://scholar.google.com/citations?hl=en&amp;user=Eq8OCpsAAAAJ">Google Scholar</a></li>
+          <li><a href="https://github.com/eugene-choi">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/choi-eugene/">LinkedIn</a></li>
+          <li><a href="mailto:eugene.choi@nyu.edu">Email</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
-<!-- <h3>Highlights</h3>
-<hr>
+  <!-- ================= EXPERIENCE ================= -->
+  <section class="section" id="experience">
+    <div class="shell">
+      <div class="section-head reveal"><h2>Experience</h2></div>
 
-<span style="font-weight:bold"> 
-    <a href="https://chuachinhon.medium.com/ai-vs-ai-detecting-llm-generated-text-eec92ea63e42" style="text-decoration: none">AI Text Classifier Evaluation</a> by
-    <a href="https://www.mediacorp.sg" style="text-decoration: none">Mediacorp</a>:
-</span>
+      <article class="entry reveal">
+        <div class="entry-rail">Aug 2023 – Present</div>
+        <div class="entry-body">
+          <h3>Senior Member of Technical Staff, <a href="https://cohere.com/">Cohere</a></h3>
+          <p class="note">Post-training LLM agents to do useful work for enterprises.
+          </p>
+        </div>
+      </article>
 
-<ul style="line-height: 1.55; font-size: 11.5pt">
-    <li>Command-A 111B (latest flagship model, #11 on LMArena at launch)</li>
-    <li>Command-A Reasoning (powers Cohere’s agentic AI platform)</li>
-    <li>Command-R7B</li>
-</ul>
+      <article class="entry reveal">
+        <div class="entry-rail">Mar 2023 – Aug 2023</div>
+        <div class="entry-body">
+          <h3>Research Engineer, <a href="https://realitydefender.com/">Reality Defender</a></h3>
+          <p class="note">Detection models for synthetic and manipulated media.</p>
+        </div>
+      </article>
 
-<span style="font-weight:bold"> 
-    <a href="https://chuachinhon.medium.com/ai-vs-ai-detecting-llm-generated-text-eec92ea63e42" style="text-decoration: none">AI Text Classifier Evaluation</a> by
-    <a href="https://www.mediacorp.sg" style="text-decoration: none">Mediacorp</a>:
-</span>
+      <article class="entry reveal">
+        <div class="entry-rail">Nov 2021 – Mar 2023</div>
+        <div class="entry-body">
+          <h3>Researcher, <a href="https://wp.nyu.edu/ml2/people/">ML² Group, New York University</a></h3>
+          <p class="note">Research on neural language models, advised by Kyunghyun Cho and Sam Bowman.</p>
+        </div>
+      </article>
+    </div>
+  </section>
 
-<ul style="line-height: 1.55; font-size: 11.5pt">
-    <li>An evaluation of the <a href="https://realitydefender.com/detect-ai-generated-text" style="text-decoration: none" target="_blank">AI-generated text detector</a> that I built at <a href="https://realitydefender.com/" style="text-decoration: none" target="_blank">Reality Defender</a>, against the detectors developed by <a href="https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text" style="text-decoration: none">OpenAI</a> and <a href="https://gptzero.me/" style="text-decoration: none">GPTZero</a>. </li>
-</ul> -->
+  <!-- ================= RESEARCH ================= -->
+  <section class="section" id="research">
+    <div class="shell">
+      <div class="section-head reveal"><h2>Research</h2></div>
 
+      <article class="entry reveal">
+        <div class="entry-rail">Frontier models</div>
+        <div class="entry-body">
+          <h3><a href="https://arxiv.org/abs/2504.00698">Command A: An Enterprise-Ready Large Language Model</a></h3>
+          <p class="byline">Team Cohere</p>
+          <p class="venue">Technical report, 2025</p>
+          <p class="tldr"><span class="tag">tl;dr</span> &nbsp;a technical report detailing the development of Cohere's flagship model, Command A.</p>
+        </div>
+      </article>
 
-<h3>Academic Background</h3>
-<hr>
-<a href="https://drive.google.com/file/d/1s_sXycCntFpBRrHfoQ1GBa1J49aPxPtP/view?usp=drive_link" style="font-weight:bold; text-decoration: none">M.S. Courant Institute, New York University</a>
-<ul style="font-size: 11.5pt">
-    <li> Computer Science </li>
-    <li> <a href="https://www.nyu.edu/registrar/forms-procedures/electronic-diploma-validation.html" style="font-weight:bold; text-decoration: none">CeDiD</a>: 23FD-I09H-E3IW</li>
-</ul>
+      <article class="entry reveal">
+        <div class="entry-rail">Self-improvement</div>
+        <div class="entry-body">
+          <h3><a href="https://iclr.cc/virtual/2025/poster/29219">Self-Improving Robust Preference Optimization</a></h3>
+          <p class="byline"><span class="me">Eugene Choi</span>, Arash Ahmadian, Matthieu Geist, Olivier Pietquin, Mohammad Gheshlaghi Azar</p>
+          <p class="venue">ICLR 2025</p>
+          <p class="tldr"><span class="tag">tl;dr</span> &nbsp;SRPO is a robust direct alignment method that unlocks inference-time self-refinement.</p>
+        </div>
+      </article>
 
-<a href="https://drive.google.com/file/d/12UbEt9qkXkawfo_8zeT_UGNJHaEBtrix/view?usp=drive_link" style="font-weight:bold; text-decoration: none">B.A. Courant Institute, New York University</a>
-<ul style="font-size: 11.5pt">
-    <li> Computer Science and a minor in Mathematics </li>
-    <li> <a href="https://www.nyu.edu/registrar/forms-procedures/electronic-diploma-validation.html" style="font-weight:bold; text-decoration: none">CeDiD</a>: 22LH-QC4F-EFIF</li>
-</ul>
+      <article class="entry reveal">
+        <div class="entry-rail">Policy optimization</div>
+        <div class="entry-body">
+          <h3><a href="https://aclanthology.org/2024.emnlp-main.1190/">Contrastive Policy Gradient: Aligning LLMs on sequence-level scores in a supervised-friendly fashion</a></h3>
+          <p class="byline">Yannis Flet-Berliac, Nathan Grinsztajn, Florian Strub, <span class="me">Eugene Choi</span>, Bill Wu, Chris Cremer, Arash Ahmadian, Yash Chandak, Mohammad Gheshlaghi Azar, Olivier Pietquin, Matthieu Geist</p>
+          <p class="venue">EMNLP 2024</p>
+          <p class="tldr"><span class="tag">tl;dr</span> &nbsp;CoPG is a scalable, principled off-policy RL algorithm that estimates the optimal policy without importance sampling.</p>
+        </div>
+      </article>
 
+      <article class="entry reveal">
+        <div class="entry-rail">Language modeling</div>
+        <div class="entry-body">
+          <h3><a href="https://iclr.cc/virtual/2023/poster/11468">A Non-monotonic Self-terminating Language Model</a></h3>
+          <p class="byline"><span class="me">Eugene Choi</span>, Kyunghyun Cho, Cheolhyoung Lee</p>
+          <p class="venue">ICLR 2023</p>
+          <p class="tldr"><span class="tag">tl;dr</span> &nbsp;prevents non-terminating sequences that arise from incomplete decoding algorithms.</p>
+        </div>
+      </article>
+    </div>
+  </section>
 
+  <!-- ================= TEACHING ================= -->
+  <section class="section" id="teaching">
+    <div class="shell">
+      <div class="section-head reveal"><h2>Teaching</h2></div>
 
-<h3>Research</h3>
-<hr>
-<a href="https://arxiv.org/abs/2504.00698" style="font-weight:bold; text-decoration: none">Command A: An Enterprise-Ready Large Language Model</a> 
-<br>
-<p class="small_2">
-<span style="line-height:170%"> Team Cohere (including <b>Eugene Choi</b>)</span>
-<br>
-<span style="font-size: 12pt; line-height:170%">  <i>Technical report </i></span>
-<br>
-<span style="line-height:195%; font-size: 10pt"> tl;dr: a technical report detailing the development of Cohere's latest flagship model, Command A.
-<!-- </span> -->
-</p>
+      <article class="entry reveal">
+        <div class="entry-rail">May 2022</div>
+        <div class="entry-body">
+          <h3>Deep Learning for NLP — <a href="https://aims-senegal.org/african-masters-in-machine-learning/">African Masters of Machine Intelligence</a></h3>
+          <!-- <p class="note">Teaching assistant and lab instructor for a modern NLP foundations course taught by Kyunghyun Cho and Duygu Ataman. Virtual.</p> -->
+          <p class="note">Teaching assistant and lab instructor for a modern NLP foundations course taught by Kyunghyun Cho and Duygu Ataman.</p>
+        </div>
+      </article>
 
-<a href="https://iclr.cc/virtual/2025/poster/29219" style="font-weight:bold; text-decoration: none">Self-Improving Robust Preference Optimization</a> 
-<br>
-<p class="small_2">
-<span style="line-height:170%"> <b>Eugene Choi</b>, Arash Ahmadian, Matthieu Geist, Oilvier Pietquin, Mohammad Gheshlaghi Azar </span>
-<br>
-<span style="font-size: 12pt; line-height:170%"><i>ICLR</i> 2025 </span>
-<br>
-<span style="line-height:195%; font-size: 10pt"> tl;dr: SRPO is a robust direct alignment method that unlocks inference time self-refinement capability.
-</span>
-<!-- <br>
-<span style="line-height:170%"> 
-    [<a href="https://openreview.net/forum?id=ZSdubdbOoi" style="text-decoration: none">openreview</a>] 
-    [<a href="https://iclr.cc/virtual/2025/poster/29219" style="text-decoration: none">iclr</a>] 
-</span> -->
-</p>
+      <article class="entry reveal">
+        <div class="entry-rail">Spring 2022</div>
+        <div class="entry-body">
+          <h3><a href="https://docs.google.com/document/d/e/2PACX-1vTf_qsddRwjk-penzOpTCgzyfPBpjmz_7YCqh8y6BFsEZ71E9hdTRh0H8P4O-z7P6dEuTcNfPnTtuVk/pub">DS-UA 203: Machine Learning for Language Understanding</a> — New York University</h3>
+          <!-- <p class="note">Section leader and teaching assistant for a research-oriented natural language understanding course taught by Sam Bowman. In person.</p> -->
+          <p class="note">Section leader and teaching assistant for a research-oriented natural language understanding course taught by Sam Bowman.</p>
+        </div>
+      </article>
+    </div>
+  </section>
 
-<a href="https://aclanthology.org/2024.emnlp-main.1190/" style="font-weight:bold; text-decoration: none">Contrastive Policy Gradient:</a>
-<a href="https://aclanthology.org/2024.emnlp-main.1190/" style="font-weight:bold; text-decoration: none; font-size: 18px;">Aligning LLMs on sequence-level scores in a supervised-friendly fashion</a>
-<!-- <br> -->
-<p class="small_2">
-<span style="line-height:170%"> Yannis Flet-Berliac, Nathan Grinsztajn, Florian Strub, <b>Eugene Choi</b>, Bill Wu, Chris Cremer, Arash Ahmadian, Yash Chandak, Mohammad Gheshlaghi Azar, Olivier Pietquin, Matthieu Geist </span>
-<br>
-<span style="font-size: 12pt; line-height:170%"> <i>EMNLP</i> 2024 </span>
-<br>
-<!-- <span style="line-height:195%; font-size: 10pt"> tl;dr: CoPG is a scalable, principled RL algorithm that estimates the optimal policy from off‐policy data. -->
-<span style="line-height:195%; font-size: 10pt"> tl;dr: CoPG is a scalable, principled off-policy RL algorithm estimating the optimal policy without importance sampling.
-</p>
+  <!-- ================= EDUCATION ================= -->
+  <section class="section" id="education">
+    <div class="shell">
+      <div class="section-head reveal"><h2>Education</h2></div>
 
+      <article class="entry reveal">
+        <div class="entry-rail">2023</div>
+        <div class="entry-body">
+          <h3><a href="https://drive.google.com/file/d/1s_sXycCntFpBRrHfoQ1GBa1J49aPxPtP/view?usp=drive_link">M.S. Computer Science</a></h3>
+          <p class="venue">Courant Institute, New York University</p>
+          <p class="credential"><a href="https://www.nyu.edu/registrar/forms-procedures/electronic-diploma-validation.html">CeDiD</a> 23FD-I09H-E3IW</p>
+        </div>
+      </article>
 
-<a href="https://iclr.cc/virtual/2023/poster/11468" style="font-weight:bold; text-decoration: none">A Non-monotonic Self-terminating Language Model</a> 
-<br>
-<p class="small_2">
-<span style="line-height:170%"> <b>Eugene Choi</b>, Kyunghyun Cho, Cheolhyoung Lee </span>
-<br>
-<span style="font-size: 12pt; line-height:170%"><i>ICLR</i> 2023 </span>
-<br>
-<span style="line-height:195%; font-size: 10pt"> tl;dr: our proposed method prevents non-terminating sequences resulting from incomplete decoding algorithms.</span>
-<!-- <br>
-<span style="line-height:170%"> 
-    [<a href="https://arxiv.org/pdf/2210.00660.pdf" style="text-decoration: none">paper</a>] 
-    [<a href="https://openreview.net/forum?id=vw-5EgYbJZr" style="text-decoration: none">openreview</a>] 
-    [<a href="https://iclr.cc/virtual/2023/poster/11468" style="text-decoration: none">iclr</a>] 
-    [<a href="https://github.com/nyu-dl/non-monotonic-self-terminating-lm" style="text-decoration: none">code</a>]
-    [<a href="/assets/bibtex/nmst.txt" style="text-decoration: none">bibtex</a>]
-</span> -->
-<!-- <br> -->
-<!-- <span style="line-height:170%">  -->
-    <!-- [<a href="https://openreview.net/forum?id=vw-5EgYbJZr" style="text-decoration: none">openreview</a>]  -->
-    <!-- [<a href="https://iclr.cc/virtual/2023/poster/11468" style="text-decoration: none">iclr</a>]  -->
-    <!-- [<a href="https://github.com/nyu-dl/non-monotonic-self-terminating-lm" style="text-decoration: none">code</a>] -->
-<!-- </span> -->
-</p>
+      <article class="entry reveal">
+        <div class="entry-rail">2022</div>
+        <div class="entry-body">
+          <h3><a href="https://drive.google.com/file/d/12UbEt9qkXkawfo_8zeT_UGNJHaEBtrix/view?usp=drive_link">B.A. Computer Science, minor in Mathematics</a></h3>
+          <p class="venue">Courant Institute, New York University</p>
+          <p class="credential"><a href="https://www.nyu.edu/registrar/forms-procedures/electronic-diploma-validation.html">CeDiD</a> 22LH-QC4F-EFIF</p>
+        </div>
+      </article>
+    </div>
+  </section>
 
+  <!-- ================= PROJECTS ================= -->
+  <section class="section" id="projects">
+    <div class="shell">
+      <div class="section-head reveal"><h2>Projects</h2></div>
 
+      <article class="entry reveal">
+        <div class="entry-rail">Dec 2021</div>
+        <div class="entry-body">
+          <h3><a href="https://github.com/jeffacce/nyu-cv2271-final/blob/main/cv_ec2684_zc2357.pdf">A Survey of Transfer Learning in Uncertainty Aware Computer-Aided Diagnosis</a></h3>
+          <p class="byline"><span class="me">Eugene Choi</span>, Jeff Cui</p>
+          <p class="venue">CSCI-GA 2271: Computer Vision, Rob Fergus</p>
+          <p class="tldr"><span class="tag">tl;dr</span> &nbsp;transfer learning for uncertainty-aware brain and kidney tumor segmentation.</p>
+          <ul class="links">
+            <li><a href="https://github.com/jeffacce/nyu-cv2271-final/blob/main/cv_ec2684_zc2357.pdf">Paper</a></li>
+            <li><a href="https://github.com/jeffacce/nyu-cv2271-final">Code</a></li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </section>
 
-<h3>Teaching</h3>
-<hr>
+</main>
 
-<p style="font-size: 12pt"><u>External</u></p>
-<a href="https://aims-senegal.org/african-masters-in-machine-learning/" style="font-weight:bold; text-decoration: none">African Masters of Machine Intelligence (AMMI)</a>
-<!--
-<a href="https://aimsammi.org/" style="font-weight:bold; text-decoration: none">African Masters of Machine Intelligence (AMMI)</a>
--->
-<ul style="font-size: 11.5pt">
-<!--
-    <li> Deep Learning for NLP by professors Kyunghyun Cho and Duygu Ataman</li>
-    <li> <b>Deep Learning for NLP</b>: a class on modern NLP foundations by professors Kyunghyun Cho and Duygu Ataman
-    <li> <b>Deep Learning for NLP</b>: a class on modern NLP foundations by Prof. Kyunghyun Cho
--->
-    <li><b>Deep Learning for NLP</b>: a modern NLP foundations class by Profs Kyunghyun Cho, Duygu Ataman</li>
-<!--
-    <li> a class on modern NLP foundations by professors Kyunghyun Cho and Duygu Ataman</li>
-    - a class on modern NLP foundations by professors Kyunghyun Cho and Duygu Ataman
--->
-    <li> May 2022, <i>Teaching Assistant / Lab Instructor</i> (virtual)</li>
-</ul>
+<footer class="foot">
+  <div class="shell" style="display:flex;flex-wrap:wrap;gap:.75rem 1.5rem;justify-content:space-between;width:100%;">
+    <span>© <span id="yr">2026</span> Eugene Choi</span>
+    <span><a href="mailto:eugene.choi@nyu.edu">eugene.choi@nyu.edu</a></span>
+  </div>
+</footer>
 
-<br>
+<script>
+(function(){
+  document.getElementById('yr').textContent = new Date().getFullYear();
 
-<p style="font-size: 12pt"><u>At New York University</u></p>
-<!--
-<a href="https://docs.google.com/document/d/e/2PACX-1vTf_qsddRwjk-penzOpTCgzyfPBpjmz_7YCqh8y6BFsEZ71E9hdTRh0H8P4O-z7P6dEuTcNfPnTtuVk/pub" style="font-weight:bold; text-decoration: none">DS-UA 203 / LING-UA 52: Machine Learning for Language Understanding</a>
--->
-<a href="https://docs.google.com/document/d/e/2PACX-1vTf_qsddRwjk-penzOpTCgzyfPBpjmz_7YCqh8y6BFsEZ71E9hdTRh0H8P4O-z7P6dEuTcNfPnTtuVk/pub" style="font-weight:bold; text-decoration: none">DS-UA 203: Machine Learning for Language Understanding</a>
-<ul style="font-size: 11.5pt">
-<!--
-    <li> Research oriented class focusing on Natural Language Understanding by Prof. Sam Bowman</li>
--->
-    <li> A research-oriented class on natural language understanding (NLU) by Prof. Sam Bowman</li>
-    <li> Spring 2022, <i>Section Leader / Teaching Assistant</i> (in-person)</li>
-</ul>
+  var bar = document.querySelector('.topbar');
+  var onScroll = function(){
+    bar.classList.toggle('is-stuck', window.scrollY > 8);
+  };
+  onScroll();
+  window.addEventListener('scroll', onScroll, {passive:true});
 
-
-
-<h3>Projects</h3>
-<hr>
-<a href="https://github.com/jeffacce/nyu-cv2271-final/blob/main/cv_ec2684_zc2357.pdf" style="font-weight:bold; text-decoration: none">A Survey of Transfer Learning in Uncertainty Aware Computer-Aided Diagnosis</a>
-<br>
-<p class="small_2">
-<span style="line-height:170%"> Eugene Choi, Jeff Cui </span>
-<br>
-<span style="line-height:170%"> <i>CSCI-GA 2271-001: Computer Vision (by Prof. Rob Fergus)</i>, Dec. 2021 </span>
-<br>
-[<a href="https://github.com/jeffacce/nyu-cv2271-final/blob/main/cv_ec2684_zc2357.pdf" style="text-decoration: none">paper</a>] 
-[<a href="https://github.com/jeffacce/nyu-cv2271-final" style="text-decoration: none">code</a>]
-<ul style="font-size: 11.5pt">
-    <li>Brain tumor segmentation demo:</li>
-    <img src = "https://i.imgur.com/DF01LnN.gif" alt = "brain tumor seg demo"/>
-    <li>Kidney tumor segmentation demo:</li>
-    <img src = "https://i.imgur.com/8Hr0boy.gif" alt = "kidney tumor seg demo"/>
-</ul>
-
-<br><br>
-<p style="font-size:12pt">
-Website layout credits to <a href="https://yzpang.github.io/" style="text-decoration: none" target="_blank">Richard Pang</a>. Thanks! :)
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var items = document.querySelectorAll('.reveal');
+  if (reduce || !('IntersectionObserver' in window)) {
+    items.forEach(function(el){ el.classList.add('is-in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+    });
+  }, {rootMargin:'0px 0px -8% 0px', threshold:0.05});
+  items.forEach(function(el){ io.observe(el); });
+})();
+</script>
+</body>
+</html>
